@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الإرسال الأوتوماتيكي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c1810 0%, #3d2b1f 50%, #1a0f0a 100%);
+            color: #e8d8c9;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(145deg, #4a3426, #362419);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #6b4f3a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #c19a6b, #d4b483, #c19a6b);
+        }
+        
+        header h1 {
+            color: #e8d8c9;
+            margin-bottom: 15px;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, #d4b483, #f5e8d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        header p {
+            color: #d4b483;
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: linear-gradient(145deg, #3d2b1f, #2c1810);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid #6b4f3a;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h2 {
+            color: #e8d8c9;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #c19a6b;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .card h2 i {
+            color: #d4b483;
+            background: rgba(193, 154, 107, 0.2);
+            padding: 12px;
+            border-radius: 12px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #d4b483;
+            font-size: 1.1rem;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(26, 15, 10, 0.7);
+            border: 2px solid #6b4f3a;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            color: #e8d8c9;
+        }
+        
+        input::placeholder, textarea::placeholder {
+            color: #a08c7a;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #c19a6b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(193, 154, 107, 0.3);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(145deg, #c19a6b, #a67c52);
+            color: #2c1810;
+            border: none;
+            padding: 18px 32px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s;
+            width: 100%;
+            text-align: center;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(193, 154, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(193, 154, 107, 0.4);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(145deg, #8a9b6e, #6b7a53);
+            box-shadow: 0 5px 15px rgba(138, 155, 110, 0.3);
+        }
+        
+        .btn-stop {
+            background: linear-gradient(145deg, #b86b6b, #954e4e);
+            box-shadow: 0 5px 15px rgba(184, 107, 107, 0.3);
+        }
+        
+        .btn-add {
+            background: linear-gradient(145deg, #d4b483, #c19a6b);
+            width: auto;
+            padding: 12px 24px;
+            margin-top: 0;
+            font-size: 16px;
+        }
+        
+        .btn-remove {
+            background: linear-gradient(145deg, #8a7c6b, #6b5e4e);
+            width: auto;
+            padding: 10px 18px;
+            font-size: 14px;
+            margin: 5px 0 0 10px;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            font-weight: 600;
+            display: none;
+            border: 2px solid transparent;
+            font-size: 1.1rem;
+        }
+        
+        .success {
+            background: rgba(110, 155, 107, 0.2);
+            color: #8acf87;
+            border-color: #6e9b6b;
+        }
+        
+        .error {
+            background: rgba(155, 107, 107, 0.2);
+            color: #cf8787;
+            border-color: #9b6b6b;
+        }
+        
+        .info {
+            background: rgba(107, 142, 155, 0.2);
+            color: #87b6cf;
+            border-color: #6b8e9b;
+        }
+        
+        .timer-display {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #d4b483;
+            direction: ltr;
+            background: rgba(26, 15, 10, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid #6b4f3a;
+        }
+        
+        .logs-container {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(26, 15, 10, 0.7);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #6b4f3a;
+        }
+        
+        .log-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #6b4f3a;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #e8d8c9;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-time {
+            color: #c19a6b;
+            margin-right: 15px;
+            float: left;
+        }
+        
+        .instructions {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(145deg, #3d2b1f, #2c1810);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border: 1px solid #6b4f3a;
+        }
+        
+        .instructions h3 {
+            color: #e8d8c9;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #c19a6b;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.6rem;
+        }
+        
+        .instructions ol {
+            padding-right: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 15px;
+            color: #d4b483;
+            line-height: 1.8;
+            padding-right: 10px;
+        }
+        
+        .instructions a {
+            color: #c19a6b;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px dashed #c19a6b;
+            transition: all 0.3s;
+        }
+        
+        .instructions a:hover {
+            color: #e8d8c9;
+            border-bottom: 1px solid #e8d8c9;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #e8d8c9;
+            font-size: 1rem;
+            padding: 30px;
+            background: rgba(26, 15, 10, 0.9);
+            border-radius: 15px;
+            border-top: 2px solid #c19a6b;
+        }
+        
+        .developer {
+            color: #d4b483;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }
+        
+        .copyright {
+            color: #a08c7a;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .required {
+            color: #b86b6b;
+        }
+        
+        .config-section {
+            background: rgba(26, 15, 10, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-right: 4px solid #c19a6b;
+            border-left: 4px solid #c19a6b;
+        }
+        
+        .config-section h4 {
+            color: #e8d8c9;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .email-list {
+            background: rgba(26, 15, 10, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid #6b4f3a;
+        }
+        
+        .email-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(42, 28, 18, 0.8);
+            border-radius: 10px;
+            border: 1px solid #8a7c6b;
+            transition: all 0.3s;
+        }
+        
+        .email-item:hover {
+            border-color: #c19a6b;
+            background: rgba(54, 36, 25, 0.8);
+        }
+        
+        .email-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .email-input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .email-counter {
+            display: inline-block;
+            background: linear-gradient(145deg, #c19a6b, #a67c52);
+            color: #2c1810;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-size: 16px;
+            font-weight: bold;
+            margin-left: 15px;
+            box-shadow: 0 3px 8px rgba(193, 154, 107, 0.3);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .stat-item {
+            background: linear-gradient(145deg, #3d2b1f, #2c1810);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #6b4f3a;
+            transition: transform 0.3s;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+            border-color: #c19a6b;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #d4b483;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: #a08c7a;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+        
+        /* تخصيص شريط التمرير */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #2c1810;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(145deg, #c19a6b, #a67c52);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(145deg, #d4b483, #c19a6b);
+        }
+        
+        /* تأثيرات إضافية */
+        .gold-text {
+            background: linear-gradient(to right, #d4b483, #f5e8d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #6b4f3a, transparent);
+            margin: 25px 0;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-paper-plane"></i> نظام الإرسال الأوتوماتيكي</h1>
+            <p>أرسل رسائل بريد إلكتروني تلقائية بشكل دوري إلى 5 عناوين بريد إلكتروني مختلفة</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="card">
+                <h2><i class="fas fa-cog"></i> إعدادات الرسائل</h2>
+                
+                <div class="config-section">
+                    <h4><i class="fas fa-key"></i> إعدادات EmailJS</h4>
+                    <div class="form-group">
+                        <label for="publicKey">المفتاح العام لـ EmailJS</label>
+                        <input type="text" id="publicKey" placeholder="أدخل المفتاح العام هنا" value="vIwyJEMK-JDmoeKnD">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">عنوان الرسالة <span class="required">*</span></label>
+                    <input type="text" id="subject" placeholder="عنوان الرسالة" value="رسالة تلقائية من النظام" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">نص الرسالة <span class="required">*</span></label>
+                    <textarea id="message" placeholder="اكتب نص الرسالة هنا..." required>السادة الكرام،
+
+تحية طيبة وبعد،
+
+نهديكم أطيب التحيات عبر هذه الرسالة التلقائية.
+هذه الرسالة جزء من نظام إرسال أوتوماتيكي.
+
+تفاصيل الإرسال:
+📅 التاريخ: {date}
+⏰ الوقت: {time}
+🆔 رقم الرسالة: {count}
+📧 البريد الإلكتروني: {email}
+🔢 الترتيب في القائمة: {index}
+
+يمكنكم استخدام المتغيرات التالية في نص الرسالة:
+{date} - تاريخ الإرسال
+{time} - وقت الإرسال
+{count} - رقم الرسالة
+{email} - البريد الإلكتروني المستلم
+{index} - رقم البريد في القائمة (1-5)
+
+مع أطيب التحيات،
+نظام الإرسال الأوتوماتيكي</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>قائمة البريد الإلكتروني (حتى 5 عناوين) <span class="required">*</span></label>
+                    <div class="email-list" id="emailList">
+                        <!-- سيتم إضافة حقول البريد هنا -->
+                    </div>
+                    <button type="button" id="addEmailBtn" class="btn-add"><i class="fas fa-plus"></i> إضافة بريد إلكتروني</button>
+                    <p style="margin-top: 15px; font-size: 14px; color: #a08c7a;">يمكنك إضافة حتى 5 عناوين بريد إلكتروني</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interval">الفترة الزمنية بين الرسائل</label>
+                    <select id="interval">
+                        <option value="0.5">كل 30 ثانية (للاختبار)</option>
+                        <option value="1">كل دقيقة</option>
+                        <option value="5" selected>كل 5 دقائق</option>
+                        <option value="10">كل 10 دقائق</option>
+                        <option value="15">كل 15 دقيقة</option>
+                        <option value="30">كل 30 دقيقة</option>
+                        <option value="60">كل ساعة</option>
+                    </select>
+                </div>
+                
+                <button id="startBtn" class="btn"><i class="fas fa-play"></i> بدء الإرسال التلقائي لجميع العناوين</button>
+                <button id="stopBtn" class="btn btn-stop"><i class="fas fa-stop"></i> إيقاف الإرسال التلقائي</button>
+                <button id="testAllBtn" class="btn btn-secondary"><i class="fas fa-paper-plane"></i> إرسال تجريبي لجميع العناوين</button>
+                
+                <div id="status" class="status"></div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> لوحة التحكم والإحصائيات</h2>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="statSent">0</div>
+                        <div class="stat-label">إجمالي الرسائل المرسلة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statActive">0</div>
+                        <div class="stat-label">عناوين البريد النشطة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statFailed">0</div>
+                        <div class="stat-label">محاولات إرسال فاشلة</div>
+                    </div>
+                </div>
+                
+                <div class="timer-display">
+                    <div id="timer">الإرسال التالي: --:--</div>
+                    <div id="counter">عدد عمليات الإرسال: 0</div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="form-group">
+                    <label>سجل الإرسال التفصيلي</label>
+                    <div class="logs-container" id="logs">
+                        <div class="log-item">سجلات الإرسال ستظهر هنا...</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button id="clearLogsBtn" class="btn"><i class="fas fa-trash"></i> تنظيف السجلات</button>
+                    <button id="saveConfigBtn" class="btn btn-secondary"><i class="fas fa-save"></i> حفظ جميع الإعدادات</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions card">
+            <h3><i class="fas fa-info-circle"></i> دليل الإعدادات السريع</h3>
+            <ol>
+                <li>قم بتسجيل الدخول إلى حساب <span class="gold-text">EmailJS</span> الخاص بك</li>
+                <li>انسخ <span class="gold-text">المفتاح العام</span> من لوحة التحكم وأدخله في الحقل المخصص</li>
+                <li>تأكد من وجود خدمة باسم <code>service_sv1ialy</code> وقالب باسم <code>template_797tjor</code></li>
+                <li>في قالب EmailJS، استخدم المتغيرات التالية:
+                    <ul style="margin-top: 10px; padding-right: 20px;">
+                        <li><code>{{to_email}}</code> - البريد الإلكتروني المستلم</li>
+                        <li><code>{{subject}}</code> - عنوان الرسالة</li>
+                        <li><code>{{message}}</code> - نص الرسالة</li>
+                        <li><code>{{time}}</code> - وقت الإرسال</li>
+                        <li><code>{{date}}</code> - تاريخ الإرسال</li>
+                        <li><code>{{count}}</code> - رقم الرسالة</li>
+                        <li><code>{{index}}</code> - رقم البريد في القائمة</li>
+                    </ul>
+                </li>
+                <li>أضف حتى 5 عناوين بريد إلكتروني واختبر النظام بالإرسال التجريبي</li>
+            </ol>
+            
+            <div class="divider"></div>
+            
+            <h3 style="margin-top: 25px;"><i class="fas fa-tools"></i> معرّفات النظام</h3>
+            <div class="config-section">
+                <p><strong><i class="fas fa-server"></i> معرّف الخدمة:</strong> <code>service_sv1ialy</code></p>
+                <p><strong><i class="fas fa-file-alt"></i> معرّف القالب:</strong> <code>template_797tjor</code></p>
+                <p><strong><i class="fas fa-key"></i> المفتاح العام:</strong> أدخله في الحقل بالأعلى</p>
+            </div>
+        </div>
+        
+        <footer>
+            <div class="developer">Developed By Ibrahim Al Sharkawi</div>
+            <div class="copyright">جميع الحقوق محفوظة © 2026</div>
+        </footer>
+    </div>
+
+    <script>
+        // عناصر DOM
+        const publicKeyInput = document.getElementById('publicKey');
+        const emailListContainer = document.getElementById('emailList');
+        const subjectInput = document.getElementById('subject');
+        const messageInput = document.getElementById('message');
+        const intervalSelect = document.getElementById('interval');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const testAllBtn = document.getElementById('testAllBtn');
+        const addEmailBtn = document.getElementById('addEmailBtn');
+        const clearLogsBtn = document.getElementById('clearLogsBtn');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const statusDiv = document.getElementById('status');
+        const timerDisplay = document.getElementById('timer');
+        const counterDisplay = document.getElementById('counter');
+        const logsContainer = document.getElementById('logs');
+        
+        // عناصر الإحصائيات
+        const statSent = document.getElementById('statSent');
+        const statActive = document.getElementById('statActive');
+        const statFailed = document.getElementById('statFailed');
+        
+        // متغيرات التحكم
+        let timer = null;
+        let sendCount = 0;
+        let failedCount = 0;
+        let nextSendTime = null;
+        let isRunning = false;
+        let emailList = [];
+        let isEmailJSInitialized = false;
+        
+        // معرفات EmailJS الثابتة
+        const EMAILJS_SERVICE_ID = "service_sv1ialy";
+        const EMAILJS_TEMPLATE_ID = "template_797tjor";
+        
+        // تهيئة قائمة البريد الإلكتروني
+        function initEmailList() {
+            // إضافة 3 حقول بريد افتراضية
+            for (let i = 0; i < 3; i++) {
+                addEmailField();
+            }
+        }
+        
+        // إضافة حقل بريد إلكتروني جديد
+        function addEmailField() {
+            if (emailList.length >= 5) {
+                showStatus("يمكنك إضافة حتى 5 عناوين بريد إلكتروني فقط", "error");
+                return;
+            }
+            
+            const index = emailList.length + 1;
+            const emailId = `email_${index}`;
+            
+            const emailItem = document.createElement('div');
+            emailItem.className = 'email-item';
+            emailItem.id = `emailItem_${index}`;
+            
+            emailItem.innerHTML = `
+                <span class="email-counter">${index}</span>
+                <input type="email" 
+                       class="email-input" 
+                       id="${emailId}" 
+                       placeholder="بريد إلكتروني ${index}" 
+                       data-index="${index}">
+                ${index > 1 ? `<button type="button" class="btn-remove" onclick="removeEmailField(${index})"><i class="fas fa-times"></i></button>` : ''}
+            `;
+            
+            emailListContainer.appendChild(emailItem);
+            emailList.push({ id: emailId, value: '', index: index });
+            
+            // إضافة مستمع حدث للحقل
+            const inputField = document.getElementById(emailId);
+            inputField.addEventListener('input', function() {
+                updateEmailValue(index - 1, this.value);
+                saveToLocalStorage();
+            });
+            
+            updateStats();
+            return emailId;
+        }
+        
+        // إزالة حقل بريد إلكتروني
+        function removeEmailField(index) {
+            if (index <= 1 || index > emailList.length) return;
+            
+            const emailItem = document.getElementById(`emailItem_${index}`);
+            if (emailItem) {
+                emailListContainer.removeChild(emailItem);
+                emailList.splice(index - 1, 1);
+                
+                // إعادة ترقيم الحقول المتبقية
+                renumberEmailFields();
+                updateStats();
+                saveToLocalStorage();
+            }
+        }
+        
+        // إعادة ترقيم حقول البريد الإلكتروني
+        function renumberEmailFields() {
+            const emailItems = emailListContainer.querySelectorAll('.email-item');
+            emailList = [];
+            
+            emailItems.forEach((item, idx) => {
+                const index = idx + 1;
+                const counter = item.querySelector('.email-counter');
+                const input = item.querySelector('input');
+                const removeBtn = item.querySelector('.btn-remove');
+                
+                // تحديث الترقيم
+                counter.textContent = index;
+                input.placeholder = `بريد إلكتروني ${index}`;
+                input.id = `email_${index}`;
+                input.setAttribute('data-index', index);
+                
+                // تحديث زر الإزالة
+                if (removeBtn) {
+                    removeBtn.onclick = function() { removeEmailField(index); };
+                }
+                
+                // تحديث القائمة
+                emailList.push({ id: `email_${index}`, value: input.value, index: index });
+            });
+        }
+        
+        // تحديث قيمة البريد الإلكتروني في القائمة
+        function updateEmailValue(index, value) {
+            if (index >= 0 && index < emailList.length) {
+                emailList[index].value = value.trim();
+            }
+        }
+        
+        // الحصول على قائمة عناوين البريد الإلكتروني الصالحة
+        function getValidEmails() {
+            return emailList
+                .filter(item => item.value && isValidEmail(item.value))
+                .map(item => item.value);
+        }
+        
+        // التحقق من صحة عنوان البريد الإلكتروني
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+        
+        // تحديث الإحصائيات
+        function updateStats() {
+            const validEmails = getValidEmails();
+            statActive.textContent = validEmails.length;
+            statSent.textContent = sendCount;
+            statFailed.textContent = failedCount;
+        }
+        
+        // تحميل البيانات من التخزين المحلي
+        function loadFromLocalStorage() {
+            const savedPublicKey = localStorage.getItem('autoEmailSender_publicKey');
+            const savedSubject = localStorage.getItem('autoEmailSender_subject');
+            const savedMessage = localStorage.getItem('autoEmailSender_message');
+            const savedInterval = localStorage.getItem('autoEmailSender_interval');
+            const savedCount = localStorage.getItem('autoEmailSender_count');
+            const savedFailed = localStorage.getItem('autoEmailSender_failed');
+            const savedLogs = localStorage.getItem('autoEmailSender_logs');
+            const savedEmails = localStorage.getItem('autoEmailSender_emails');
+            
+            if (savedPublicKey) publicKeyInput.value = savedPublicKey;
+            if (savedSubject) subjectInput.value = savedSubject;
+            if (savedMessage) messageInput.value = savedMessage;
+            if (savedInterval) intervalSelect.value = savedInterval;
+            if (savedCount) {
+                sendCount = parseInt(savedCount);
+                counterDisplay.textContent = `عدد عمليات الإرسال: ${sendCount}`;
+            }
+            if (savedFailed) {
+                failedCount = parseInt(savedFailed);
+            }
+            
+            if (savedLogs) {
+                logsContainer.innerHTML = savedLogs;
+            }
+            
+            // تحميل قائمة البريد الإلكتروني
+            if (savedEmails) {
+                try {
+                    const emails = JSON.parse(savedEmails);
+                    emails.forEach((email, index) => {
+                        if (index < emailList.length) {
+                            const input = document.getElementById(emailList[index].id);
+                            if (input && email) {
+                                input.value = email;
+                                updateEmailValue(index, email);
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error("خطأ في تحميل قائمة البريد الإلكتروني:", e);
+                }
+            }
+            
+            // تهيئة EmailJS بالمفتاح المحفوظ
+            if (savedPublicKey && savedPublicKey.trim() !== '') {
+                initEmailJS();
+                showStatus("تم تحميل إعدادات النظام بنجاح!", "success");
+            }
+            
+            updateStats();
+        }
+        
+        // حفظ البيانات في التخزين المحلي
+        function saveToLocalStorage() {
+            const emails = emailList.map(item => item.value);
+            
+            localStorage.setItem('autoEmailSender_publicKey', publicKeyInput.value);
+            localStorage.setItem('autoEmailSender_subject', subjectInput.value);
+            localStorage.setItem('autoEmailSender_message', messageInput.value);
+            localStorage.setItem('autoEmailSender_interval', intervalSelect.value);
+            localStorage.setItem('autoEmailSender_count', sendCount.toString());
+            localStorage.setItem('autoEmailSender_failed', failedCount.toString());
+            localStorage.setItem('autoEmailSender_logs', logsContainer.innerHTML);
+            localStorage.setItem('autoEmailSender_emails', JSON.stringify(emails));
+        }
+        
+        // إضافة سجل جديد
+        function addLog(message, type = 'info') {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ar-EG');
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+            
+            let typeIcon = '📝';
+            if (type === 'success') typeIcon = '✅';
+            if (type === 'error') typeIcon = '❌';
+            
+            logItem.innerHTML = `<span class="log-time">${timeString}</span> ${typeIcon} <span class="log-${type}">${message}</span>`;
+            
+            logsContainer.insertBefore(logItem, logsContainer.firstChild);
+            
+            // حفظ السجل في التخزين المحلي
+            saveToLocalStorage();
+        }
+        
+        // تحديث العداد
+        function updateCounter() {
+            counterDisplay.textContent = `عدد عمليات الإرسال: ${sendCount}`;
+            updateStats();
+        }
+        
+        // تحديث المؤقت
+        function updateTimer() {
+            if (!nextSendTime) return;
+            
+            const now = new Date();
+            const diff = nextSendTime - now;
+            
+            if (diff <= 0) {
+                timerDisplay.textContent = "جارٍ الإرسال...";
+                return;
+            }
+            
+            const minutes = Math.floor(diff / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            
+            timerDisplay.textContent = `الإرسال التالي: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // تهيئة EmailJS
+        function initEmailJS() {
+            const publicKey = publicKeyInput.value.trim();
+            if (!publicKey) {
+                return false;
+            }
+            
+            try {
+                emailjs.init(publicKey);
+                isEmailJSInitialized = true;
+                addLog("تم تهيئة EmailJS بنجاح", "success");
+                return true;
+            } catch (error) {
+                console.error("فشل تهيئة EmailJS:", error);
+                isEmailJSInitialized = false;
+                addLog("فشل تهيئة EmailJS، تأكد من المفتاح", "error");
+                return false;
+            }
+        }
+        
+        // التحقق من إعدادات EmailJS
+        function validateEmailJSConfig() {
+            const publicKey = publicKeyInput.value.trim();
+            if (!publicKey) {
+                showStatus("يرجى إدخال مفتاح EmailJS العام", "error");
+                return false;
+            }
+            
+            const validEmails = getValidEmails();
+            if (validEmails.length === 0) {
+                showStatus("يرجى إدخال عنوان بريد إلكتروني واحد على الأقل", "error");
+                return false;
+            }
+            
+            if (!subjectInput.value.trim()) {
+                showStatus("يرجى إدخال عنوان للرسالة", "error");
+                return false;
+            }
+            
+            if (!messageInput.value.trim()) {
+                showStatus("يرجى إدخال نص الرسالة", "error");
+                return false;
+            }
+            
+            // تهيئة EmailJS إذا لم تكن مهيأة مسبقاً
+            if (!isEmailJSInitialized) {
+                if (!initEmailJS()) {
+                    showStatus("مفتاح EmailJS غير صالح", "error");
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        // إرسال رسالة بريد إلكتروني إلى عنوان محدد
+        async function sendEmailToAddress(email, emailIndex) {
+            const subject = subjectInput.value.trim();
+            let message = messageInput.value.trim();
+            
+            // استبدال المتغيرات في نص الرسالة
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ar-EG');
+            const dateString = now.toLocaleDateString('ar-EG');
+            
+            message = message
+                .replace(/{time}/g, timeString)
+                .replace(/{date}/g, dateString)
+                .replace(/{count}/g, sendCount + 1)
+                .replace(/{email}/g, email)
+                .replace(/{index}/g, emailIndex);
+            
+            try {
+                // معلمات القالب - تأكد أن هذه الأسماء تتطابق مع قالبك في EmailJS
+                const templateParams = {
+                    to_email: email,
+                    subject: subject,
+                    message: message,
+                    time: timeString,
+                    date: dateString,
+                    count: sendCount + 1,
+                    index: emailIndex
+                };
+                
+                // إرسال البريد الإلكتروني
+                const response = await emailjs.send(
+                    EMAILJS_SERVICE_ID,
+                    EMAILJS_TEMPLATE_ID,
+                    templateParams
+                );
+                
+                return { success: true, email: email };
+                
+            } catch (error) {
+                console.error(`فشل إرسال البريد الإلكتروني إلى ${email}:`, error);
+                return { success: false, email: email, error: error };
+            }
+        }
+        
+        // إرسال رسائل إلى جميع العناوين
+        async function sendToAllEmails() {
+            if (!validateEmailJSConfig()) {
+                return { success: false, sent: 0, total: 0 };
+            }
+            
+            const validEmails = getValidEmails();
+            if (validEmails.length === 0) {
+                showStatus("لا توجد عناوين بريد إلكتروني صالحة للإرسال", "error");
+                return { success: false, sent: 0, total: 0 };
+            }
+            
+            let successfulSends = 0;
+            let failedSends = 0;
+            
+            // إرسال إلى كل عنوان
+            for (let i = 0; i < validEmails.length; i++) {
+                const email = validEmails[i];
+                const emailIndex = i + 1;
+                
+                const result = await sendEmailToAddress(email, emailIndex);
+                
+                if (result.success) {
+                    successfulSends++;
+                    sendCount++;
+                    addLog(`تم إرسال رسالة #${sendCount} إلى ${email} (العنوان: "${subjectInput.value}")`, 'success');
+                } else {
+                    failedSends++;
+                    failedCount++;
+                    addLog(`فشل إرسال رسالة إلى ${email}: ${result.error?.text || 'خطأ غير معروف'}`, 'error');
+                }
+                
+                // تأخير بسيط بين الإرسالات لتجنب المشاكل
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            updateCounter();
+            
+            if (successfulSends > 0) {
+                showStatus(`تم إرسال ${successfulSends} رسالة بنجاح!`, "success");
+                saveToLocalStorage();
+            }
+            
+            if (failedSends > 0) {
+                addLog(`فشل إرسال ${failedSends} رسالة`, 'error');
+            }
+            
+            return { 
+                success: successfulSends > 0, 
+                sent: successfulSends, 
+                total: validEmails.length,
+                failed: failedSends 
+            };
+        }
+        
+        // بدء الإرسال التلقائي
+        async function startAutoSending() {
+            if (isRunning) {
+                showStatus("الإرسال التلقائي يعمل بالفعل", "info");
+                return;
+            }
+            
+            showStatus("جارٍ بدء الإرسال التلقائي...", "info");
+            
+            if (!validateEmailJSConfig()) {
+                return;
+            }
+            
+            const validEmails = getValidEmails();
+            if (validEmails.length === 0) {
+                showStatus("لا توجد عناوين بريد إلكتروني صالحة للإرسال", "error");
+                return;
+            }
+            
+            isRunning = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            
+            // إرسال أول دفعة من الرسائل فوراً
+            const result = await sendToAllEmails();
+            
+            if (result.sent > 0 || result.success) {
+                const intervalMinutes = parseFloat(intervalSelect.value);
+                
+                // حساب وقت الإرسال التالي
+                scheduleNextSend(intervalMinutes);
+                
+                // تحديث المؤقت كل ثانية
+                clearInterval(timer);
+                timer = setInterval(updateTimer, 1000);
+                
+                addLog(`بدأ الإرسال التلقائي كل ${intervalMinutes} دقيقة إلى ${validEmails.length} عنوان`, "info");
+                showStatus(`بدأ الإرسال التلقائي إلى ${validEmails.length} عنوان`, "success");
+            } else {
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                if (result.failed === validEmails.length) {
+                    showStatus("فشل إرسال جميع الرسائل. تحقق من الإعدادات والمفتاح العام.", "error");
+                } else {
+                    showStatus("فشل إرسال بعض الرسائل. تحقق من السجلات.", "error");
+                }
+            }
+        }
+        
+        // جدولة الإرسال التالي
+        function scheduleNextSend(intervalMinutes) {
+            const now = new Date();
+            nextSendTime = new Date(now.getTime() + intervalMinutes * 60000);
+            updateTimer();
+            
+            // تعيين مؤقت للإرسال التالي
+            setTimeout(async () => {
+                if (isRunning) {
+                    const result = await sendToAllEmails();
+                    if (result.sent > 0 || result.success) {
+                        scheduleNextSend(intervalMinutes);
+                    } else {
+                        addLog("توقف الإرسال التلقائي بسبب فشل الإرسال المتكرر", "error");
+                        stopAutoSending();
+                    }
+                }
+            }, intervalMinutes * 60000);
+        }
+        
+        // إيقاف الإرسال التلقائي
+        function stopAutoSending() {
+            isRunning = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            
+            clearInterval(timer);
+            timerDisplay.textContent = "الإرسال التالي: --:--";
+            nextSendTime = null;
+            
+            addLog("تم إيقاف الإرسال التلقائي", "info");
+            showStatus("تم إيقاف الإرسال التلقائي", "info");
+        }
+        
+        // عرض حالة الإرسال
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            // إخفاء الرسالة بعد 5 ثواني
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        // مسح سجل الإرسال
+        function clearLogs() {
+            if (confirm("هل أنت متأكد من مسح سجل الإرسال؟")) {
+                logsContainer.innerHTML = '<div class="log-item">سجلات الإرسال ستظهر هنا...</div>';
+                saveToLocalStorage();
+                showStatus("تم مسح سجل الإرسال", "info");
+            }
+        }
+        
+        // إعداد معالجات الأحداث
+        function setupEventListeners() {
+            startBtn.addEventListener('click', startAutoSending);
+            stopBtn.addEventListener('click', stopAutoSending);
+            
+            testAllBtn.addEventListener('click', async () => {
+                if (!validateEmailJSConfig()) {
+                    return;
+                }
+                
+                const validEmails = getValidEmails();
+                if (validEmails.length === 0) {
+                    showStatus("لا توجد عناوين بريد إلكتروني صالحة للإرسال", "error");
+                    return;
+                }
+                
+                showStatus(`جارٍ إرسال رسالة تجريبية إلى ${validEmails.length} عنوان...`, "info");
+                const result = await sendToAllEmails();
+                
+                if (result.sent > 0) {
+                    showStatus(`تم إرسال ${result.sent} رسالة تجريبية بنجاح! تحقق من بريدك.`, "success");
+                } else {
+                    showStatus(`فشل إرسال الرسائل التجريبية`, "error");
+                }
+            });
+            
+            addEmailBtn.addEventListener('click', function() {
+                addEmailField();
+                saveToLocalStorage();
+            });
+            
+            clearLogsBtn.addEventListener('click', clearLogs);
+            
+            saveConfigBtn.addEventListener('click', () => {
+                saveToLocalStorage();
+                showStatus("تم حفظ جميع الإعدادات بنجاح!", "success");
+            });
+            
+            publicKeyInput.addEventListener('input', () => {
+                isEmailJSInitialized = false;
+                const key = publicKeyInput.value.trim();
+                if (key && key.length > 10) {
+                    try {
+                        if (initEmailJS()) {
+                            addLog("تم تحديث مفتاح النظام بنجاح", "success");
+                            showStatus("تم تحديث المفتاح العام بنجاح", "success");
+                        } else {
+                            addLog("مفتاح النظام غير صالح", "error");
+                        }
+                    } catch (error) {
+                        addLog("خطأ في تهيئة المفتاح", "error");
+                    }
+                }
+            });
+            
+            // حفظ التغييرات تلقائياً عند التعديل
+            subjectInput.addEventListener('input', saveToLocalStorage);
+            messageInput.addEventListener('input', saveToLocalStorage);
+            intervalSelect.addEventListener('change', saveToLocalStorage);
+        }
+        
+        // تهيئة التطبيق
+        function init() {
+            initEmailList();
+            loadFromLocalStorage();
+            setupEventListeners();
+            stopBtn.disabled = true;
+            
+            // محاولة تهيئة EmailJS عند البدء
+            setTimeout(() => {
+                if (publicKeyInput.value.trim()) {
+                    initEmailJS();
+                }
+                showStatus("مرحبًا بك في نظام الإرسال الأوتوماتيكي! أدخل عناوين البريد الإلكتروني واختبر النظام أولاً.", "info");
+            }, 1000);
+        }
+        
+        // بدء التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
